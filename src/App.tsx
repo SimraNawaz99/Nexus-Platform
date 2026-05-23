@@ -22,18 +22,18 @@ import { EntrepreneurProfile } from './pages/profile/EntrepreneurProfile';
 import { InvestorProfile }     from './pages/profile/InvestorProfile';
 
 // Feature Pages
-import SchedulingPage       from './pages/scheduling/SchedulingPage';
-import VideoPage            from './pages/video/VideoPage';
-import DocumentChamberPage  from './pages/documents-chamber/DocumentChamberPage';
-import PaymentsPage         from './pages/payments/PaymentsPage';
-import { DocumentsPage }    from './pages/documents/DocumentsPage';
-import { InvestorsPage }    from './pages/investors/InvestorsPage';
+import SchedulingPage        from './pages/scheduling/SchedulingPage';
+import VideoPage             from './pages/video/VideoPage';
+import DocumentChamberPage   from './pages/documents-chamber/DocumentChamberPage';
+import PaymentsPage          from './pages/payments/PaymentsPage';
+import { DocumentsPage }     from './pages/documents/DocumentsPage';
+import { InvestorsPage }     from './pages/investors/InvestorsPage';
 import { EntrepreneursPage } from './pages/entrepreneurs/EntrepreneursPage';
-import { MessagesPage }     from './pages/messages/MessagesPage';
+import { MessagesPage }      from './pages/messages/MessagesPage';
 import { NotificationsPage } from './pages/notifications/NotificationsPage';
-import { SettingsPage }     from './pages/settings/SettingsPage';
-import { HelpPage }         from './pages/help/HelpPage';
-import { DealsPage }        from './pages/deals/DealsPage';
+import { SettingsPage }      from './pages/settings/SettingsPage';
+import { HelpPage }          from './pages/help/HelpPage';
+import { DealsPage }         from './pages/deals/DealsPage';
 
 // Chat Pages
 import { ChatPage } from './pages/chat/ChatPage';

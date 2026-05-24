@@ -1,46 +1,73 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { ShieldCheck, RefreshCw, ArrowLeft } from "lucide-react";
 
-function generateOTP(): string {
-  const otp = Math.floor(100000 + Math.random() * 900000).toString();
-  console.info(`[2FA Mock] Your OTP is: ${otp}`);
-  return otp;
+// ✅ Module-level: runs ONCE when the file is imported, never again
+let initialOTP: string | null = null;
+function getInitialOTP(): string {
+  if (!initialOTP) {
+    initialOTP = Math.floor(100000 + Math.random() * 900000).toString();
+    console.info(`[2FA Mock] Your OTP is: ${initialOTP}`);
+  }
+  return initialOTP;
 }
 
 export default function Login2FAPage() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
+  const [mockOTP, setMockOTP] = useState<string>(getInitialOTP);
+
   const [otp, setOtp] = useState<string[]>(Array(6).fill(""));
-  const mockOTPRef = useRef<string>(generateOTP());
   const [error, setError] = useState("");
   const [verified, setVerified] = useState(false);
   const [resent, setResent] = useState(false);
 
   const inputs = useRef<(HTMLInputElement | null)[]>([]);
 
-  if (!user) {
-    navigate("/login", { replace: true });
-    return null;
-  }
+  useEffect(() => {
+    if (!user) {
+      navigate("/login", { replace: true });
+    }
+  }, [user, navigate]);
+
+  if (!user) return null;
 
   const role = user.role;
 
   const handleChange = (index: number, value: string) => {
-    if (!/^\d*$/.test(value)) return; 
+    if (!/^\d*$/.test(value)) return;
     const updated = [...otp];
-    updated[index] = value.slice(-1); 
+    updated[index] = value.slice(-1);
     setOtp(updated);
     setError("");
 
-    
     if (value && index < 5) {
       inputs.current[index + 1]?.focus();
     }
-  };
 
+    if (index === 5 && value) {
+      const entered = updated.join("");
+      if (entered.length === 6) {
+        if (entered !== mockOTP) {
+          setError("Invalid OTP. Please try again.");
+          setOtp(Array(6).fill(""));
+          inputs.current[0]?.focus();
+        } else {
+          setVerified(true);
+          setTimeout(() => {
+            navigate(
+              role === "investor"
+                ? "/dashboard/investor"
+                : "/dashboard/entrepreneur",
+              { replace: true }
+            );
+          }, 1200);
+        }
+      }
+    }
+  };
 
   const handleKeyDown = (index: number, e: React.KeyboardEvent) => {
     if (e.key === "Backspace" && !otp[index] && index > 0) {
@@ -63,8 +90,7 @@ export default function Login2FAPage() {
       setError("Please enter all 6 digits.");
       return;
     }
-    
-    if (entered !== mockOTPRef.current) {
+    if (entered !== mockOTP) {
       setError("Invalid OTP. Please try again.");
       setOtp(Array(6).fill(""));
       inputs.current[0]?.focus();
@@ -82,16 +108,21 @@ export default function Login2FAPage() {
   };
 
   const handleResend = useCallback(() => {
+    // ✅ Reset module-level cache so next OTP is fresh
+    initialOTP = null;
+    const newOtp = getInitialOTP();
+    setMockOTP(newOtp);
     setOtp(Array(6).fill(""));
     setError("");
     setResent(true);
-    mockOTPRef.current = generateOTP();
     setTimeout(() => setResent(false), 3000);
     inputs.current[0]?.focus();
   }, []);
 
   const handleBack = () => {
     logout();
+    // ✅ Clear cached OTP on logout so next login gets a fresh one
+    initialOTP = null;
     navigate("/login");
   };
 
@@ -160,7 +191,7 @@ export default function Login2FAPage() {
               value={digit}
               onChange={(e) => handleChange(i, e.target.value)}
               onKeyDown={(e) => handleKeyDown(i, e)}
-              onPaste={i === 0 ? handlePaste : undefined}
+              onPaste={handlePaste}
               className={`w-11 h-12 text-center text-xl font-bold rounded-lg border-2
                 transition-colors focus:outline-none
                 ${error

@@ -27,7 +27,6 @@ const TYPE_COLOR: Record<TransactionType, string> = {
   "Funding Deal": "text-purple-600",
 };
 
-// Persistent storage keys
 const STORAGE_KEY_BALANCE      = "nexus_wallet_balance";
 const STORAGE_KEY_TRANSACTIONS = "nexus_transactions";
 
@@ -52,7 +51,6 @@ export default function PaymentsPage() {
   const [filterType, setFilterType]     = useState<TransactionType | "All">("All");
   const [error, setError]               = useState("");
 
-  // Persist balance & transactions on every change
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY_BALANCE, String(balance));
   }, [balance]);
@@ -92,7 +90,7 @@ export default function PaymentsPage() {
     setAmount("");
   };
 
-  // Derived stats
+
   const totalDeposited = transactions
     .filter(t => t.type === "Deposit" && t.status === "Success")
     .reduce((sum, t) => sum + t.amount, 0);

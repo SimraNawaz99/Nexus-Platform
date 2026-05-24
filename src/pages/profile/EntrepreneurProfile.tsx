@@ -14,7 +14,6 @@ export const EntrepreneurProfile: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { user: currentUser } = useAuth();
   
-  // Fetch entrepreneur data
   const entrepreneur = findUserById(id || '') as Entrepreneur | null;
   
   if (!entrepreneur || entrepreneur.role !== 'entrepreneur') {
@@ -32,7 +31,6 @@ export const EntrepreneurProfile: React.FC = () => {
   const isCurrentUser = currentUser?.id === entrepreneur.id;
   const isInvestor = currentUser?.role === 'investor';
   
-  // Check if the current investor has already sent a request to this entrepreneur
   const hasRequestedCollaboration = isInvestor && id 
     ? getRequestsFromInvestor(currentUser.id).some(req => req.entrepreneurId === id)
     : false;
@@ -45,8 +43,6 @@ export const EntrepreneurProfile: React.FC = () => {
         `I'm interested in learning more about ${entrepreneur.startupName} and would like to explore potential investment opportunities.`
       );
       
-      // In a real app, we would refresh the data or update state
-      // For this demo, we'll force a page reload
       window.location.reload();
     }
   };

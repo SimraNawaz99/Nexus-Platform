@@ -8,7 +8,6 @@ import GuidedWalkthrough from "../../pages/walkthrough/GuidedWalkthrough";
 export const DashboardLayout: React.FC = () => {
   const { isAuthenticated, isLoading } = useAuth();
 
-  // Show spinner while the auth state is being restored from localStorage
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -17,7 +16,7 @@ export const DashboardLayout: React.FC = () => {
     );
   }
 
-  // Redirect to login if not authenticated
+
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }

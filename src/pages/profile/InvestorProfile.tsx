@@ -13,7 +13,7 @@ export const InvestorProfile: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { user: currentUser } = useAuth();
   
-  // Fetch investor data
+  
   const investor = findUserById(id || '') as Investor | null;
   
   if (!investor || investor.role !== 'investor') {

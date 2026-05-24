@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { ShieldCheck, RefreshCw, ArrowLeft } from "lucide-react";
 
-// Generate a random 6-digit mock OTP and log it so you can test
 function generateOTP(): string {
   const otp = Math.floor(100000 + Math.random() * 900000).toString();
   console.info(`[2FA Mock] Your OTP is: ${otp}`);
@@ -15,7 +14,6 @@ export default function Login2FAPage() {
   const navigate = useNavigate();
 
   const [otp, setOtp] = useState<string[]>(Array(6).fill(""));
-  // FIX: use a ref for mockOTP so handleResend can update it without re-render issues
   const mockOTPRef = useRef<string>(generateOTP());
   const [error, setError] = useState("");
   const [verified, setVerified] = useState(false);
@@ -23,7 +21,6 @@ export default function Login2FAPage() {
 
   const inputs = useRef<(HTMLInputElement | null)[]>([]);
 
-  // If someone lands here without being logged in, send back to login
   if (!user) {
     navigate("/login", { replace: true });
     return null;
@@ -31,28 +28,26 @@ export default function Login2FAPage() {
 
   const role = user.role;
 
-  // Handle typing in OTP boxes
   const handleChange = (index: number, value: string) => {
-    if (!/^\d*$/.test(value)) return; // digits only
+    if (!/^\d*$/.test(value)) return; 
     const updated = [...otp];
-    updated[index] = value.slice(-1); // keep only last digit
+    updated[index] = value.slice(-1); 
     setOtp(updated);
     setError("");
 
-    // Auto-advance to next box
+    
     if (value && index < 5) {
       inputs.current[index + 1]?.focus();
     }
   };
 
-  // Handle backspace — go back to previous box
+
   const handleKeyDown = (index: number, e: React.KeyboardEvent) => {
     if (e.key === "Backspace" && !otp[index] && index > 0) {
       inputs.current[index - 1]?.focus();
     }
   };
 
-  // Handle paste — fill all 6 boxes at once
   const handlePaste = (e: React.ClipboardEvent) => {
     e.preventDefault();
     const pasted = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, 6);
@@ -68,7 +63,7 @@ export default function Login2FAPage() {
       setError("Please enter all 6 digits.");
       return;
     }
-    // FIX: compare against the ref value which is always current
+    
     if (entered !== mockOTPRef.current) {
       setError("Invalid OTP. Please try again.");
       setOtp(Array(6).fill(""));
@@ -86,12 +81,10 @@ export default function Login2FAPage() {
     }, 1200);
   };
 
-  // FIX: handleResend now correctly updates the ref so verification works after resend
   const handleResend = useCallback(() => {
     setOtp(Array(6).fill(""));
     setError("");
     setResent(true);
-    // Generate a new OTP and store it in the ref
     mockOTPRef.current = generateOTP();
     setTimeout(() => setResent(false), 3000);
     inputs.current[0]?.focus();
